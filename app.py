@@ -26,9 +26,11 @@ def get_driver():
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")  # Evitar problemas de memória compartilhada
+    chrome_options.binary_location = "/usr/bin/google-chrome"  # Caminho do Google Chrome no Streamlit Cloud
 
-    chrome_service = ChromeService(ChromeDriverManager().install())  # Instalar automaticamente o ChromeDriver
+    chrome_service = ChromeService(executable_path="/usr/bin/chromedriver")  # Caminho do ChromeDriver
     return webdriver.Chrome(service=chrome_service, options=chrome_options)
+
 
 
 
