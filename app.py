@@ -12,6 +12,7 @@ import re
 import pandas as pd
 from io import BytesIO
 from datetime import datetime
+from webdriver_manager.chrome import ChromeDriverManager
 
 # Configuração da página
 st.set_page_config(
@@ -23,7 +24,8 @@ def get_driver():
     chrome_options = Options()
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--no-sandbox")
-    chrome_service = ChromeService(executable_path='chromedriver.exe')
+    chrome_options.add_argument("--headless")  # Executar no modo headless
+    chrome_service = ChromeService(executable_path=ChromeDriverManager().install())
     return webdriver.Chrome(service=chrome_service, options=chrome_options)
 
 def scrape_with_catalog(keyword):
@@ -167,3 +169,4 @@ if st.session_state['history']:
             df_history = pd.DataFrame(history, columns=["Código do Produto", "Lote", "Validade", "Certificado"])
             df_history["Certificado"] = df_history["Certificado"].apply(lambda x: f'<a href="{x}" target="_blank">Baixar Certificado</a>')
             st.write(df_history.to_html(escape=False, index=False), unsafe_allow_html=True)
+
