@@ -32,9 +32,6 @@ def get_driver():
     chrome_service = ChromeService(ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install())
     return webdriver.Chrome(service=chrome_service, options=chrome_options)
 
-
-
-
 def scrape_with_catalog(keyword):
     link = f'https://store.usp.org/product/{keyword}'
     driver = get_driver()
@@ -130,7 +127,6 @@ if st.session_state['keywords']:
 # Validação de entrada
 keywords = [str(k).strip() for k in keywords if str(k).strip()]
 
-
 if st.button("Buscar"):
     st.session_state.results = []
 
@@ -184,4 +180,5 @@ if st.session_state['history']:
             df_history = pd.DataFrame(history, columns=["Código do Produto", "Lote", "Validade", "Certificado"])
             df_history["Certificado"] = df_history["Certificado"].apply(lambda x: f'<a href="{x}" target="_blank">Baixar Certificado</a>')
             st.write(df_history.to_html(escape=False, index=False), unsafe_allow_html=True)
+
 
