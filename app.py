@@ -26,7 +26,9 @@ def get_driver():
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")  # Evitar problemas de memória compartilhada
-    chrome_service = ChromeService(ChromeDriverManager().install())
+    chrome_options.binary_location = "/usr/bin/chromium-browser"  # Caminho do navegador no Streamlit Cloud
+
+    chrome_service = ChromeService(executable_path="/usr/bin/chromedriver")  # Caminho do driver
     return webdriver.Chrome(service=chrome_service, options=chrome_options)
 
 
@@ -110,10 +112,12 @@ st.session_state['uploaded_file'] = st.file_uploader(
 )
 
 if st.session_state['uploaded_file']:
-    df = pd.read_excel(st.session_state['uploaded_file'])
-    keywords = st.session_state['keywords'].split(',')
-    keywords.extend(df[df.columns[0]].astype(str).tolist())
-else:
+    try:
+        df = pd.read_excel(st.session_state['uploaded_file'])
+        keywords = st.session_state['keywords'].split(',')
+        keywords.extend(df[df.columns[0]].astype(str).tolist())
+    except Exception as e:
+        st.error(f"Erro ao carregar o arquivo Excel: {e}")
     keywords = st.session_state['keywords'].split(',')
 
 # Validação de entrada
