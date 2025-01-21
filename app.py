@@ -26,10 +26,9 @@ def get_driver():
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")  # Evitar problemas de memória compartilhada
-    chrome_options.add_argument("--remote-debugging-port=9222")  # Porta remota para depuração
-    
     chrome_service = ChromeService(ChromeDriverManager().install())
     return webdriver.Chrome(service=chrome_service, options=chrome_options)
+
 
 
 def scrape_with_catalog(keyword):
