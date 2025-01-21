@@ -13,6 +13,7 @@ import pandas as pd
 from io import BytesIO
 from datetime import datetime
 from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.core.utils import ChromeType
 
 # Configuração da página
 st.set_page_config(
@@ -26,8 +27,9 @@ def get_driver():
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")  # Evitar problemas de memória compartilhada
+    chrome_options.binary_location = "/usr/bin/chromium"  # Caminho do Chromium no Streamlit Cloud
 
-    chrome_service = ChromeService(ChromeDriverManager().install())  # Instalar automaticamente o ChromeDriver
+    chrome_service = ChromeService(ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install())
     return webdriver.Chrome(service=chrome_service, options=chrome_options)
 
 
