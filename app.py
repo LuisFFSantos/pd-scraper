@@ -32,9 +32,18 @@ import streamlit as st
 
 
 
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.service import Service as ChromeService
+from selenium.webdriver.chrome.options import Options
+from webdriver_manager.chrome import ChromeDriverManager
+import os
+from shutil import which
+import streamlit as st
+
 def get_driver():
     chrome_options = Options()
-    chrome_options.add_argument("--headless=new")  # Executar no modo headless
+    chrome_options.add_argument("--headless=new")  # Modo headless
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
@@ -51,12 +60,13 @@ def get_driver():
     st.write(f"Caminho do navegador detectado: {chrome_path}")
 
     try:
-        # Use uma versão específica do ChromeDriver
-        chrome_service = ChromeService(ChromeDriverManager(version="120.0.6099.224").install())  # Substitua pela versão correta
+        # Instala o ChromeDriver correto baseado no navegador detectado
+        chrome_service = ChromeService(ChromeDriverManager().install())
         return webdriver.Chrome(service=chrome_service, options=chrome_options)
     except Exception as e:
         st.error(f"Erro ao configurar o driver do navegador: {e}")
         return None
+
 
 
 
