@@ -20,34 +20,30 @@ st.set_page_config(
     page_icon="🔍"  # Ícone da aba (emoji ou caminho para arquivo)
 )
 
-from webdriver_manager.chrome import ChromeDriverManager
 
 def get_driver():
     chrome_options = Options()
-    chrome_options.add_argument("--headless")  # Modo headless
+    chrome_options.add_argument("--headless")  # Modo headless para servidores
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
-    chrome_options.add_argument("--disable-background-timer-throttling")
-    chrome_options.add_argument("--disable-backgrounding-occluded-windows")
-    chrome_options.add_argument("--remote-debugging-port=9222")
 
-    # Verifica o caminho do Chrome no sistema
-    chrome_path = which("chrome") or which("google-chrome") or "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+    # Caminho do Chrome
+    chrome_path = which("google-chrome") or which("chromium") or "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
     if not os.path.exists(chrome_path):
-        st.error(f"Google Chrome não foi encontrado no caminho: {chrome_path}")
+        st.error(f"Navegador não encontrado no caminho: {chrome_path}")
         return None
-
     chrome_options.binary_location = chrome_path
 
-    # Configura o ChromeDriver
+    # Caminho do ChromeDriver
+    driver_path = ChromeDriverManager().install()  # Ou especifique o caminho manualmente
     try:
-        driver_path = ChromeDriverManager().install()
         chrome_service = ChromeService(executable_path=driver_path)
         return webdriver.Chrome(service=chrome_service, options=chrome_options)
     except Exception as e:
-        st.error(f"Erro ao configurar o driver do Chrome: {e}")
+        st.error(f"Erro ao configurar o driver do navegador: {e}")
         return None
+
 
 
 def scrape_with_catalog(keyword):
