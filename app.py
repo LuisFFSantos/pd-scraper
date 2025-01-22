@@ -23,29 +23,32 @@ st.set_page_config(
 
 def get_driver():
     chrome_options = Options()
-    chrome_options.add_argument("--headless=new")  # Rodar em modo headless
-    chrome_options.add_argument("--disable-gpu")
-    chrome_options.add_argument("--no-sandbox")
-    chrome_options.add_argument("--disable-dev-shm-usage")
-    chrome_options.add_argument("--disable-software-rasterizer")
-    chrome_options.add_argument("--remote-debugging-port=9222")
-    chrome_options.add_argument("--log-level=3")
+    chrome_options.add_argument("--headless=new")  # Executar em modo headless
+    chrome_options.add_argument("--disable-gpu")  # Desativar GPU
+    chrome_options.add_argument("--no-sandbox")  # Necessário para ambientes restritos
+    chrome_options.add_argument("--disable-dev-shm-usage")  # Usar memória não compartilhada
+    chrome_options.add_argument("--disable-software-rasterizer")  # Evitar problemas gráficos
+    chrome_options.add_argument("--remote-debugging-port=9222")  # Porta de depuração
+    chrome_options.add_argument("--log-level=3")  # Minimizar logs desnecessários
 
-    # Detecta automaticamente o caminho do Chromium ou Chrome
-    chrome_path = which("chromium") or which("chromium-browser")
-    if not chrome_path:
-        st.error("Nenhum navegador compatível foi encontrado no ambiente.")
+    # Defina o caminho do Google Chrome no Windows
+    chrome_path = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+    chrome_options.binary_location = chrome_path
+
+    # Verifique se o Chrome está disponível
+    if not os.path.exists(chrome_path):
+        st.error(f"O Chrome não foi encontrado no caminho: {chrome_path}")
         return None
 
-    chrome_options.binary_location = chrome_path
-    st.write(f"Caminho do Chromium detectado: {chrome_path}")
+    st.write(f"Caminho do Chrome detectado: {chrome_path}")
 
     try:
         chrome_service = ChromeService(ChromeDriverManager().install())
         return webdriver.Chrome(service=chrome_service, options=chrome_options)
     except Exception as e:
-        st.error(f"Erro ao configurar o driver do Chrome/Chromium: {e}")
+        st.error(f"Erro ao configurar o driver do Chrome: {e}")
         raise
+
 
 
 
