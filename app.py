@@ -14,73 +14,40 @@ from datetime import datetime
 from webdriver_manager.chrome import ChromeDriverManager
 from shutil import which
 
-
 # Configuração da página
 st.set_page_config(
     page_title="Consulta Padrão",  # Título da aba do navegador
     page_icon="🔍"  # Ícone da aba (emoji ou caminho para arquivo)
 )
 
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service as ChromeService
-from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
-import os
-from shutil import which
-import streamlit as st
-
-
-
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service as ChromeService
-from selenium.webdriver.chrome.options import Options
-from webdriver_manager.chrome import ChromeDriverManager
-import os
-from shutil import which
-import streamlit as st
-
-import os
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service as ChromeService
-from selenium.webdriver.chrome.options import Options
-import streamlit as st
-
-import os
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service as ChromeService
-from selenium.webdriver.chrome.options import Options
-import streamlit as st
 
 def get_driver():
     chrome_options = Options()
-    chrome_options.add_argument("--headless")  # Executar em modo headless
+    chrome_options.add_argument("--headless")  # Modo headless
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
-    chrome_options.add_argument("--disable-software-rasterizer")
+    chrome_options.add_argument("--disable-background-timer-throttling")
+    chrome_options.add_argument("--disable-backgrounding-occluded-windows")
+    chrome_options.add_argument("--remote-debugging-port=9222")
 
-    # Especifique o caminho para o executável do Google Chrome
-    chrome_path = "/caminho/para/google-chrome"  # Substitua pelo caminho real
+    # Verifica o caminho do Chrome no sistema
+    chrome_path = which("chrome") or which("google-chrome") or "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
     if not os.path.exists(chrome_path):
         st.error(f"Google Chrome não foi encontrado no caminho: {chrome_path}")
         return None
+
     chrome_options.binary_location = chrome_path
 
-    # Especifique o caminho para o ChromeDriver
-    driver_path = "/caminho/para/chromedriver"  # Substitua pelo caminho real
-    if not os.path.exists(driver_path):
-        st.error(f"ChromeDriver não foi encontrado no caminho: {driver_path}")
-        return None
-
+    # Configura o ChromeDriver
     try:
+        driver_path = ChromeDriverManager().install()
         chrome_service = ChromeService(executable_path=driver_path)
         return webdriver.Chrome(service=chrome_service, options=chrome_options)
     except Exception as e:
-        st.error(f"Erro ao configurar o driver do navegador: {e}")
+        st.error(f"Erro ao configurar o driver do Chrome: {e}")
         return None
-
 
 
 def scrape_with_catalog(keyword):
