@@ -47,19 +47,29 @@ from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.chrome.options import Options
 import streamlit as st
 
+import os
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service as ChromeService
+from selenium.webdriver.chrome.options import Options
+import streamlit as st
+
 def get_driver():
     chrome_options = Options()
-    chrome_options.add_argument("--headless=new")  # Modo headless
+    chrome_options.add_argument("--headless")  # Executar em modo headless
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--disable-software-rasterizer")
-    chrome_options.add_argument("--remote-debugging-port=9222")
 
-    # Configura o ChromeDriver com o caminho manual
-    driver_path = os.path.join(os.getcwd(), "chromedriver.exe")  # Caminho no Windows
-    chrome_options.binary_location = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+    # Especifique o caminho para o executável do Google Chrome
+    chrome_path = "/caminho/para/google-chrome"  # Substitua pelo caminho real
+    if not os.path.exists(chrome_path):
+        st.error(f"Google Chrome não foi encontrado no caminho: {chrome_path}")
+        return None
+    chrome_options.binary_location = chrome_path
 
+    # Especifique o caminho para o ChromeDriver
+    driver_path = "/caminho/para/chromedriver"  # Substitua pelo caminho real
     if not os.path.exists(driver_path):
         st.error(f"ChromeDriver não foi encontrado no caminho: {driver_path}")
         return None
@@ -70,7 +80,6 @@ def get_driver():
     except Exception as e:
         st.error(f"Erro ao configurar o driver do navegador: {e}")
         return None
-
 
 
 
