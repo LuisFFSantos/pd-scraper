@@ -24,30 +24,29 @@ st.set_page_config(
 def get_driver():
     chrome_options = Options()
     chrome_options.add_argument("--disable-gpu")
-    chrome_options.add_argument("--disable-software-rasterizer")
-    chrome_options.add_argument("--disable-webgl")
-    chrome_options.add_argument("--use-gl=swiftshader")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--disable-software-rasterizer")
     chrome_options.add_argument("--disable-extensions")
     chrome_options.add_argument("--log-level=3")
     chrome_options.add_argument("--disable-background-networking")
 
-    # Detecta automaticamente o caminho do Chrome
-    chrome_path = which("chrome") or which("google-chrome") or "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
-    chrome_options.binary_location = chrome_path
+    # Detecta automaticamente o caminho do Chromium ou Chrome
+    chrome_path = which("chromium") or which("chromium-browser") or which("chrome") or which("google-chrome")
+    if not chrome_path:
+        st.error("Nenhum navegador compatível foi encontrado no ambiente.")
+        return None
 
-    # Depuração: Exibe o caminho detectado
-   # st.write(f"Caminho do Chrome detectado: {chrome_path}")
+    chrome_options.binary_location = chrome_path
+    st.write(f"Caminho do Chromium/Chrome detectado: {chrome_path}")
 
     try:
-        # Força uma versão específica do ChromeDriver, se necessário
+        # Configura o ChromeDriver
         chrome_service = ChromeService(ChromeDriverManager().install())
         return webdriver.Chrome(service=chrome_service, options=chrome_options)
     except Exception as e:
-        st.error(f"Erro ao configurar o driver do Chrome: {e}")
+        st.error(f"Erro ao configurar o driver do Chrome/Chromium: {e}")
         raise
-
 
 
 
