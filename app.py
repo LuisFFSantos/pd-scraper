@@ -21,33 +21,42 @@ st.set_page_config(
     page_icon="🔍"  # Ícone da aba (emoji ou caminho para arquivo)
 )
 
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.service import Service as ChromeService
+from selenium.webdriver.chrome.options import Options
+from webdriver_manager.chrome import ChromeDriverManager
+import os
+from shutil import which
+import streamlit as st
+
+
+
 def get_driver():
     chrome_options = Options()
-    chrome_options.add_argument("--headless=new")  # Executar em modo headless
+    chrome_options.add_argument("--headless=new")  # Executar no modo headless
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--disable-software-rasterizer")
     chrome_options.add_argument("--remote-debugging-port=9222")
 
-    # Detectar o Chromium no ambiente de produção
-    chrome_path = which("chromium") or which("chromium-browser")
-    if not chrome_path:
-        st.error("Chromium não foi encontrado no ambiente.")
+    # Detecta o Chromium ou Google Chrome
+    chrome_path = which("chromium") or which("chromium-browser") or "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+    if not chrome_path or not os.path.exists(chrome_path):
+        st.error("Nenhum navegador compatível encontrado no ambiente.")
         return None
 
     chrome_options.binary_location = chrome_path
-    st.write(f"Caminho do Chromium detectado: {chrome_path}")
+    st.write(f"Caminho do navegador detectado: {chrome_path}")
 
     try:
-        chrome_service = ChromeService(ChromeDriverManager().install())
+        # Use uma versão específica do ChromeDriver
+        chrome_service = ChromeService(ChromeDriverManager(version="120.0.6099.224").install())  # Substitua pela versão correta
         return webdriver.Chrome(service=chrome_service, options=chrome_options)
     except Exception as e:
-        st.error(f"Erro ao configurar o driver do Chrome/Chromium: {e}")
+        st.error(f"Erro ao configurar o driver do navegador: {e}")
         return None
-
-
-
 
 
 
