@@ -43,29 +43,32 @@ import streamlit as st
 
 def get_driver():
     chrome_options = Options()
-    chrome_options.add_argument("--headless=new")  # Modo headless
+    chrome_options.add_argument("--headless=new")  # Executar no modo headless
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--disable-software-rasterizer")
     chrome_options.add_argument("--remote-debugging-port=9222")
 
-    # Detecta o Chromium ou Google Chrome
-    chrome_path = which("chromium") or which("chromium-browser") or "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
-    if not chrome_path or not os.path.exists(chrome_path):
-        st.error("Nenhum navegador compatível encontrado no ambiente.")
+    # Detecta o Chromium
+    chrome_path = which("chromium") or which("chromium-browser")
+    if not chrome_path:
+        st.error("Chromium não foi encontrado no ambiente.")
         return None
 
     chrome_options.binary_location = chrome_path
-    st.write(f"Caminho do navegador detectado: {chrome_path}")
+    st.write(f"Caminho do Chromium detectado: {chrome_path}")
 
     try:
-        # Instala o ChromeDriver correto baseado no navegador detectado
-        chrome_service = ChromeService(ChromeDriverManager().install())
+        # Use o caminho manual do ChromeDriver
+        chrome_service = ChromeService(executable_path="/usr/local/bin/chromedriver")  # Linux
+        # Para Windows, substitua o caminho:
+        # chrome_service = ChromeService(executable_path="C:\\chromedriver\\chromedriver.exe")
         return webdriver.Chrome(service=chrome_service, options=chrome_options)
     except Exception as e:
         st.error(f"Erro ao configurar o driver do navegador: {e}")
         return None
+
 
 
 
