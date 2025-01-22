@@ -6,14 +6,13 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
-import requests
 import os
 import re
 import pandas as pd
 from io import BytesIO
 from datetime import datetime
 from webdriver_manager.chrome import ChromeDriverManager
-from webdriver_manager.core.utils import ChromeType
+from shutil import which
 
 
 # Configuração da página
@@ -24,21 +23,41 @@ st.set_page_config(
 
 def get_driver():
     chrome_options = Options()
-    chrome_options.add_argument("--headless")  # Executar no modo headless
     chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--disable-software-rasterizer")
+    chrome_options.add_argument("--disable-webgl")
+    chrome_options.add_argument("--use-gl=swiftshader")
     chrome_options.add_argument("--no-sandbox")
-    chrome_options.add_argument("--disable-dev-shm-usage")  # Evitar problemas de memória compartilhada
-    chrome_options.binary_location = "/usr/bin/chromium"  # Caminho do Chromium no Streamlit Cloud
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--disable-extensions")
+    chrome_options.add_argument("--log-level=3")
+    chrome_options.add_argument("--disable-background-networking")
 
-    chrome_service = ChromeService(ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install())
-    return webdriver.Chrome(service=chrome_service, options=chrome_options)
+    # Detecta automaticamente o caminho do Chrome
+    chrome_path = which("chrome") or which("google-chrome") or "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+    chrome_options.binary_location = chrome_path
+
+    # Depuração: Exibe o caminho detectado
+   # st.write(f"Caminho do Chrome detectado: {chrome_path}")
+
+    try:
+        # Força uma versão específica do ChromeDriver, se necessário
+        chrome_service = ChromeService(ChromeDriverManager().install())
+        return webdriver.Chrome(service=chrome_service, options=chrome_options)
+    except Exception as e:
+        st.error(f"Erro ao configurar o driver do Chrome: {e}")
+        raise
+
+
+
+
 
 def scrape_with_catalog(keyword):
     link = f'https://store.usp.org/product/{keyword}'
     driver = get_driver()
     try:
         driver.get(link)
-        WebDriverWait(driver, 10).until(
+        WebDriverWait(driver, 20).until(
             EC.presence_of_element_located((By.CLASS_NAME, 'attr-value'))
         )
 
@@ -72,6 +91,9 @@ def scrape_with_catalog(keyword):
                     lot_data.append((keyword, lot_number_cleaned, valid_date, certificate_url))
 
         return lot_data
+    except Exception as e:
+        st.error(f"Erro ao buscar dados para {keyword}: {e}")
+        return []
     finally:
         driver.quit()
 
@@ -181,5 +203,3 @@ if st.session_state['history']:
             df_history = pd.DataFrame(history, columns=["Código do Produto", "Lote", "Validade", "Certificado"])
             df_history["Certificado"] = df_history["Certificado"].apply(lambda x: f'<a href="{x}" target="_blank">Baixar Certificado</a>')
             st.write(df_history.to_html(escape=False, index=False), unsafe_allow_html=True)
-
-
