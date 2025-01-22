@@ -23,9 +23,11 @@ st.set_page_config(
 
 def get_driver():
     chrome_options = Options()
+    chrome_options.add_argument("--headless=new")  # Se necessário rodar no modo headless
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--remote-debugging-port=9222")
     chrome_options.add_argument("--disable-software-rasterizer")
     chrome_options.add_argument("--disable-extensions")
     chrome_options.add_argument("--log-level=3")
@@ -47,6 +49,7 @@ def get_driver():
     except Exception as e:
         st.error(f"Erro ao configurar o driver do Chrome/Chromium: {e}")
         raise
+
 
 
 
